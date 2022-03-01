@@ -71,7 +71,7 @@ const View = ({char}) => {
                 </div>
             </div>
             <div className="char__descr">
-                {description}
+                {description ? `${description.slice(0, 210)}...` : 'Sorry, description is not found.'}
             </div>
             <div className="char__comics">Comics:</div>
             <ul className="char__comics-list">

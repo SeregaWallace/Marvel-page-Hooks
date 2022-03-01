@@ -60,7 +60,6 @@ const CharList = (props) =>{
                <CSSTransition key={item.id} timeout={500} classNames="char__item">
                 <li 
                 className="char__item"
-                key={item.id}
                 ref={el => itemRefs.current[i] = el}
                 onClick={() => {props.onSelectChar(item.id)
                                 focusOnItem(i)}}>
