@@ -17,6 +17,7 @@ const SingleComic = () => {
 
     useEffect(() => {
         updateComicnfo();
+        // eslint-disable-next-line
     }, [comicId])
 
     const updateComicnfo = () => {

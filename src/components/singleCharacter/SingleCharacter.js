@@ -16,6 +16,7 @@ const SingleCharacter = () => {
 
     useEffect(() => {
         updateData()
+        // eslint-disable-next-line
     }, [id])
 
     const updateData = () => {

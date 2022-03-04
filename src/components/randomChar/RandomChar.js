@@ -26,6 +26,7 @@ const RandomChar = () => {
 
     useEffect(() => {
         updateRandomChar();
+        // eslint-disable-next-line
     }, [])
 
     return (

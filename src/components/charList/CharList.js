@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import useMarvelService from '../../services/MarvelService';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import Spinner from '../spinner/Spinner';
@@ -11,16 +11,12 @@ const setContent = (process, newItemLoading, Component) => {
     switch (process) {
         case 'waiting':
             return <Spinner/>;
-            break;
         case 'loading':
             return newItemLoading ? <Component/> : <Spinner/>;
-            break;
         case 'error':
             return <ErrorMessage/>;
-            break;
         case 'confirmed':
             return <Component/>;
-            break;
         default:
             throw new Error('Unexpected process state');
     }
@@ -51,6 +47,7 @@ const CharList = (props) => {
 
     useEffect(() => {
         onRequestMore(offset, true);
+        // eslint-disable-next-line
     }, [])
 
     const onRequestMore = (offset, initial) => {
@@ -99,9 +96,14 @@ const CharList = (props) => {
         )
     }
 
+    const listElements = useMemo(() => {
+        return setContent(process, newItemLoading, () => renderItems(charList));
+        // eslint-disable-next-line
+    }, [process]);
+
     return (
         <div className="char__list">
-            {setContent(process, newItemLoading, () => renderItems(charList))}
+            {listElements}
             <button className="button button__main button__long"
                     disabled={newItemLoading}
                     style={{'display': charEnded ? 'none' : 'block'}}
