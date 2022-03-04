@@ -1,20 +1,39 @@
 import { useState, useEffect, useRef } from 'react';
 import useMarvelService from '../../services/MarvelService';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 
 import './charList.scss';
 
-const CharList = (props) =>{
+
+const setContent = (process, newItemLoading, Component) => {
+    switch (process) {
+        case 'waiting':
+            return <Spinner/>;
+            break;
+        case 'loading':
+            return newItemLoading ? <Component/> : <Spinner/>;
+            break;
+        case 'error':
+            return <ErrorMessage/>;
+            break;
+        case 'confirmed':
+            return <Component/>;
+            break;
+        default:
+            throw new Error('Unexpected process state');
+    }
+}
+
+const CharList = (props) => {
 
     const [charList, setCharList] = useState([]);
     const [newItemLoading, setNewItemLoading] = useState(false);
     const [offset, setOffset] = useState(210);
     const [charEnded, setCharEnded] = useState(false);
 
-    const {loading, error, getAllCharacters} = useMarvelService();
+    const {getAllCharacters, process, setProcess} = useMarvelService();
 
     const charListLoaded = (newCharList) => {
         let ended = false;
@@ -26,7 +45,7 @@ const CharList = (props) =>{
         setCharList(charList => [...charList, ...newCharList]);
         setNewItemLoading(false);
         setOffset(offset => offset + 9);
-        setCharEnded(charEnded => ended);
+        setCharEnded(ended);
 
     }
 
@@ -38,6 +57,7 @@ const CharList = (props) =>{
         initial ? setNewItemLoading(false) : setNewItemLoading(true);
         getAllCharacters(offset)
             .then(charListLoaded)
+            .then(() => setProcess('confirmed'))
     }
 
     const itemRefs = useRef([]);
@@ -69,7 +89,7 @@ const CharList = (props) =>{
                </CSSTransition>
             )
         });
-        // А эта конструкция вынесена для центровки спиннера/ошибки
+        
         return (
             <ul className="char__grid">
                 <TransitionGroup component={null}>
@@ -79,17 +99,9 @@ const CharList = (props) =>{
         )
     }
 
-
-    const items = renderItems(charList);
-
-    const errorMessage = error ? <ErrorMessage/> : null;
-    const spinner = loading && !newItemLoading ? <Spinner/> : null;
-
     return (
         <div className="char__list">
-            {errorMessage}
-            {spinner}
-            {items}
+            {setContent(process, newItemLoading, () => renderItems(charList))}
             <button className="button button__main button__long"
                     disabled={newItemLoading}
                     style={{'display': charEnded ? 'none' : 'block'}}

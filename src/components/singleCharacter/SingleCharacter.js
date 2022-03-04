@@ -3,8 +3,7 @@ import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 
 import useMarvelService from '../../services/MarvelService';
-import Spinner from '../spinner/Spinner';
-import ErrorMessage from '../errorMessage/ErrorMessage';
+import setContent from "../../utils/setContent";
 import AppBanner from "../appBanner/AppBanner";
 
 import './singleCharacter.scss';
@@ -13,7 +12,7 @@ import './singleCharacter.scss';
 const SingleCharacter = () => {
     const {id} = useParams();
     const [data, setData] = useState(null);
-    const {loading, error, getCharacter, clearError} = useMarvelService();
+    const {getCharacter, clearError, process, setProcess} = useMarvelService();
 
     useEffect(() => {
         updateData()
@@ -22,23 +21,18 @@ const SingleCharacter = () => {
     const updateData = () => {
         clearError();
         getCharacter(id)
-            .then(onDataLoaded);
+            .then(onDataLoaded)
+            .then(() => setProcess('confirmed'))
     }
 
     const onDataLoaded = (data) => {
         setData(data);
     }
 
-    const errorMessage = error ? <ErrorMessage/> : null;
-    const spinner = loading ? <Spinner/> : null;
-    const content = !(loading || error || !data) ? <View data={data}/> : null;
-
     return (
         <>
             <AppBanner/>
-            {errorMessage}
-            {spinner}
-            {content}
+            {setContent(process, data, View)}
         </>
     )
 }
